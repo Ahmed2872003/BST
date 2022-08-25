@@ -1,4 +1,5 @@
 #include<iostream>
+
 using namespace std;
 
 template<class t>
@@ -208,28 +209,30 @@ typename BST<t>::node* BST<t>::remove(node* r, t target)
         {r->left = remove(r->left , target);r = balance(r);}
     else
     {
+        t temp;
+        node* bBF  = r;
         if(!r->right && !r->left)
             return NULL;
         else if(!r->right || !r->left)
         {
             if(!r->left)
             {
-                t temp = r->right->data;
-                remove(r , temp);
-                r->data = temp;
+                temp = r->right->data; 
+                r = remove(r , temp);
+                bBF->data = temp;
             }
-            if(!r->right)
+            else if(!r->right)
             {
-                t temp = r->left->data;
-                remove(r , temp);
-                r->data = temp;
+                temp = r->left->data;
+                r = remove(r , temp);
+                bBF->data = temp;
             }
         }
         else
         {   
-            t temp = getMaxNode(r->left)->data;
-            remove(r , temp);
-            r->data = temp;
+            temp = getMaxNode(r->left)->data;
+            r = remove(r , temp);
+            bBF->data = temp;
         }
     }
     
@@ -318,16 +321,20 @@ return height(r->left) - height(r->right);
 int main()
 {
     BST<int>btree;
-    btree.insert(50);
-    btree.insert(30);
-    btree.insert(60);
-    btree.insert(40);
-    btree.insert(12);
-    btree.remove(30);
-    btree.remove(40);
-    btree.insert(70);
-    btree.insert(100);
+    btree.insert(5);
+    btree.insert(2);
+    btree.insert(1);
+    btree.insert(3);
+    btree.insert(4);
+    btree.insert(8);
+    btree.insert(7);
+    btree.insert(6);
+    btree.insert(20); 
+    btree.insert(9);
+    btree.insert(25);  
+    btree.insert(30);  
+    btree.remove(1);
     btree.inorderShow();
-    //12   50   60   70   100
+    //2   3   4   5   6   7   8   9   20   25   30
     return 0;
 }
