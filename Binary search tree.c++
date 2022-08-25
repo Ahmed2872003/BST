@@ -13,35 +13,43 @@ class BST
             node* left;
             node() : right(NULL) , left(NULL){}
             node(t& v) : node(){data = v;}
-        }* root;
+        };
+        node* insert(node* , node*);
+        node* remove(node* , t);
+        void preorderShow(node*);
+        void inorderShow(node*);
+        void postorderShow(node*);
+        t getMin(node*);
+        node* getMinNode(node*);
+        t getMax(node*);
+        node* getMaxNode(node*);
+        int BF(node*);
+        node* balance(node*);
+        node* RR_rotat(node*);
+        node* LL_rotat(node*);
+        node* LR_rotat(node*);
+        node* RL_rotat(node*);
         /*----------End of creating nodes----------*/
     public:
+        node* root;
         BST() : root(NULL){}
         bool empty();
         void insert(t);
-        void insert(node* , node*);
         t getMax();
-        t getMax(node*);
-        node* getMaxNode(node*);
         t getMin();
-        t getMin(node*);
-        node* getMinNode(node*);
         void remove(t);
-        node* remove(node* , t);
-        bool isThere(t);
-        bool isThere(t , node*);
         void inorderShow();
-        void inorderShow(node*);
         void preorderShow();
-        void preorderShow(node*);
         void postorderShow();
-        void postorderShow(node*);
+        int height(node*);
+        ~BST(){}
+
 };
 
 
 template<class t>
 bool BST<t>::empty()
-{return root == NULL;}
+{return !root;}
 /*----------Begin inserting nodes----------*/
 template<class t>
 void BST<t>::insert(t value)
@@ -50,27 +58,85 @@ void BST<t>::insert(t value)
     if(empty())
         root = newnode;
     else
-        insert(root , newnode);
+        root = insert(root , newnode);
 }
 template<class t>
-void BST<t>::insert(node* r , node* newnode)
+typename BST<t>::node* BST<t>::insert(node* r , node* newnode)
 {
+    if(!r)
+        return newnode;
     if(newnode->data <= r->data)
-    {
-        if(!r->left) // = r->left == NULL
-            r->left = newnode;
-        else
-            insert(r->left , newnode);
-    }
-    else
-    {
-        if(!r->right)
-            r->right = newnode;
-        else
-            insert(r->right , newnode);
-    }
+        {
+            r->left = insert(r->left , newnode);
+            r = balance(r);
+        }
+    else     
+        {
+            r->right = insert(r->right , newnode);
+            r = balance(r);
+        }
+    return r;
 }
 /*----------End of inserting nodes----------*/
+/*----------start balancing----------*/
+template<class t>
+typename BST<t>::node* BST<t>::balance(node* parent)
+{
+    if(BF(parent) < -1)
+    {
+        if(BF(parent->right) == -1)
+            parent = RR_rotat(parent);
+        else
+            parent = RL_rotat(parent);
+    }
+    else if(BF(parent) > 1)
+    {
+        if(BF(parent->left) == 1)
+            parent = LL_rotat(parent);
+        else
+            parent = LR_rotat(parent);
+    }
+    return parent;
+}
+/*----------End of balancing----------*/
+/*----------Start RR_rotation----------*/
+template<class t>
+typename BST<t>::node* BST<t>::RR_rotat(node* parent)
+{
+node* bring = parent->right;
+parent->right = bring->left;
+bring->left = parent;
+return bring;
+}
+/*----------End RR_rotation----------*/
+/*----------Start LL_rotation----------*/
+template<class t>
+typename BST<t>::node* BST<t>::LL_rotat(node* parent)
+{
+node* bring = parent->left;
+parent->left = bring->right;
+bring->right = parent;
+return bring;
+}
+/*----------End LL_rotation----------*/
+/*----------Start RL_rotation----------*/
+template<class t>
+typename BST<t>::node* BST<t>::RL_rotat(node* parent)
+{
+parent->right = LL_rotat(parent->right);
+parent = RR_rotat(parent);
+return parent;
+}
+/*----------End RL_rotation----------*/
+/*----------Start LR_rotation----------*/
+template<class t>
+typename BST<t>::node* BST<t>::LR_rotat(node* parent)
+{
+parent->left = RR_rotat(parent->left);
+parent = LL_rotat(parent);
+return parent;
+}
+/*----------End LR_rotation----------*/
 /*----------Begin of geting max node----------*/
 template<class t>
 t BST<t>::getMax()
@@ -172,25 +238,6 @@ typename BST<t>::node* BST<t>::remove(node* r, t target)
 
 /*----------End of deleting node----------*/
 /*----------begin of checking existence node----------*/
-template<class t>
-bool BST<t>::isThere(t target)
-{
-    if(empty())
-        {cout << "Empty tree\n";return false;}
-    isThere(target , root);
-}
-template<class t>
-bool BST<t>::isThere(t target , node*r)
-{
-    if(!r)
-        return 0;
-    else if(target == r->data)
-        return true;
-    else if(target > r->data)
-        isThere(target , r->right);
-    else
-        isThere(target , r->left);
-}
 /*----------End of checking existence node----------*/
 /*----------Displaying----------*/
 /*----------begin of showing elements(inorder)----------*/
@@ -208,9 +255,8 @@ void BST<t>::inorderShow(node* r)
     if(!r)
         return;
     inorderShow(r->left);
-    cout << r->data << '\t';
+    cout << r->data << "   ";
     inorderShow(r->right);
-
 }
 /*----------end of showing elements(inorder)----------*/
 /*----------begin of showing elements(preorder)----------*/
@@ -227,7 +273,7 @@ void BST<t>::preorderShow(node* r)
 {
     if(!r)
         return;
-    cout << r->data << '\t';
+    cout << r->data << "   ";
     preorderShow(r->left);
     preorderShow(r->right);
 
@@ -250,33 +296,35 @@ void BST<t>::postorderShow(node* r)
         return;
     postorderShow(r->left);
     postorderShow(r->right);
-    cout << r->data << '\t';
+    cout << r->data << "   ";
 }
-/*----------end of showing elements(postorder)----------*/
-
+/*----------End of showing elements(postorder)----------*/
+/*----------Start tree height----------*/
+template<class t>
+int BST<t>::height(node* r)
+{
+    if(!r)
+        return -1;
+    int hlt = height(r->left) + 1; 
+    int hrt = height(r->right) + 1;
+    return hlt >= hrt ? hlt : hrt;
+}
+/*----------End tree height----------*/
+/*----------start calculating BF----------*/
+template<class t>
+int BST<t>::BF(node* r)
+{
+return height(r->left) - height(r->right);
+}
+/*----------start calculating BF----------*/
 int main()
 {
     BST<int>btree;
-	btree.insert(45);
-	btree.insert(15);
-	btree.insert(79);
-	btree.insert(90);
-	btree.insert(10);
-	btree.insert(55);
-	btree.insert(12);
-	btree.insert(20);
-	btree.insert(50);
-    cout << " Display the Tree Contenet \n";
-	btree.preorderShow();
-	cout << " \n Delete Items \n ";
-	btree.remove(12);
-	cout << "\n preorder After Delete 12 \n ";
-	btree.preorderShow();
-
-	btree.remove(15);
-	cout << "\n preorder After Delete 15 \n ";
-	btree.preorderShow();
-
-
+    btree.insert(30);
+    btree.insert(20);
+    btree.insert(50);
+    btree.insert(40);
+    btree.insert(45);
+    cout << btree.root->left->data;
     return 0;
 }
