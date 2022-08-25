@@ -66,15 +66,10 @@ typename BST<t>::node* BST<t>::insert(node* r , node* newnode)
     if(!r)
         return newnode;
     if(newnode->data <= r->data)
-        {
-            r->left = insert(r->left , newnode);
-            r = balance(r);
-        }
+        r->left = insert(r->left , newnode);
     else     
-        {
-            r->right = insert(r->right , newnode);
-            r = balance(r);
-        }
+        r->right = insert(r->right , newnode);
+    r = balance(r);
     return r;
 }
 /*----------End of inserting nodes----------*/
@@ -144,7 +139,7 @@ t BST<t>::getMax()
     if(empty())
         return -1;
     else 
-        getMax(root);
+    return getMax(root);
 
 }
 template<class t>
@@ -153,7 +148,7 @@ t BST<t>::getMax(node* r)
     if(!r->right)
         return r->data;
     else
-        getMax(r->right);
+        return getMax(r->right);
 
 }
 template<class t>
@@ -162,8 +157,7 @@ typename BST<t>::node* BST<t>::getMaxNode(node* r)
     if(!r->right)
         return r;
     else
-        getMax(r->right);
-
+        return getMaxNode(r->right);
 }
 /*----------End of geting max node----------*/
 /*----------Begin of geting min node----------*/
@@ -173,8 +167,7 @@ t BST<t>::getMin()
     if(empty())
         return -1;
     else
-        getMin(root);
-
+        return getMin(root);
 }
 template<class t>
 t BST<t>::getMin(node* r)
@@ -182,7 +175,7 @@ t BST<t>::getMin(node* r)
     if(!r->left)
         return r->data;
     else
-        getMin(r->left);
+        return getMin(r->left);
 
 }
 template<class t>
@@ -191,7 +184,7 @@ typename BST<t>::node* BST<t>::getMinNode(node* r)
     if(!r->left)
         return r;
     else
-        getMin(r->left);
+        return getMin(r->left);
 
 }
 /*----------End of geting min node----------*/
@@ -202,43 +195,48 @@ void BST<t>::remove(t target)
     if(empty())
         {cout <<"Empty tree\n";return;}
     else
-        remove(root , target);
+    root = remove(root , target);
 }
 template<class t>
 typename BST<t>::node* BST<t>::remove(node* r, t target)
 {
-    if(r == NULL)
-        {cout << "There's no Node with that value\n";return r;}
-    else if(target > r->data)
-        r->right = remove(r->right , target);
-    else if (target < r->data)
-        r->left = remove(r->left , target);
+    if(!r)
+        {cout <<"NO node with that value";return root;}
+    if(target > r->data)
+        {r->right = remove(r->right , target);r = balance(r);}
+    else if(target < r->data)
+        {r->left = remove(r->left , target);r = balance(r);}
     else
     {
         if(!r->right && !r->left)
-            r = NULL;
+            return NULL;
         else if(!r->right || !r->left)
         {
-            t d;
+            if(!r->left)
+            {
+                t temp = r->right->data;
+                remove(r , temp);
+                r->data = temp;
+            }
             if(!r->right)
-                {d = r->left->data;remove(r , r->left->data);r->data = d;}
-            else
-                {d = r->right->data;remove(r , r->right->data);r->data =d;}
+            {
+                t temp = r->left->data;
+                remove(r , temp);
+                r->data = temp;
+            }
         }
         else
-        {
-            node* temp = getMaxNode(r->left);
-            t d = temp->data;
-            remove(r , temp->data);
-            r->data = d;
-        }   
+        {   
+            t temp = getMaxNode(r->left)->data;
+            remove(r , temp);
+            r->data = temp;
+        }
     }
+    
     return r;
 }
 
 /*----------End of deleting node----------*/
-/*----------begin of checking existence node----------*/
-/*----------End of checking existence node----------*/
 /*----------Displaying----------*/
 /*----------begin of showing elements(inorder)----------*/
 template<class t>
@@ -320,11 +318,15 @@ return height(r->left) - height(r->right);
 int main()
 {
     BST<int>btree;
-    btree.insert(30);
-    btree.insert(20);
     btree.insert(50);
+    btree.insert(30);
+    btree.insert(60);
     btree.insert(40);
-    btree.insert(45);
-    cout << btree.root->left->data;
+    btree.insert(12);
+    btree.remove(30);
+    btree.remove(40);
+    btree.insert(70);
+    btree.insert(100);
+    btree.inorderShow();
     return 0;
 }
