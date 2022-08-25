@@ -79,14 +79,14 @@ typename BST<t>::node* BST<t>::balance(node* parent)
 {
     if(BF(parent) < -1)
     {
-        if(BF(parent->right) == -1)
+        if(BF(parent->right) < 0)
             parent = RR_rotat(parent);
         else
             parent = RL_rotat(parent);
     }
     else if(BF(parent) > 1)
     {
-        if(BF(parent->left) == 1)
+        if(BF(parent->left) > 0)
             parent = LL_rotat(parent);
         else
             parent = LR_rotat(parent);
@@ -328,5 +328,6 @@ int main()
     btree.insert(70);
     btree.insert(100);
     btree.inorderShow();
+    //12   50   60   70   100
     return 0;
 }
